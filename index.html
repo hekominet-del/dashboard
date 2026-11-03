@@ -187,8 +187,13 @@
   .clock-card{flex-direction:row;align-items:center;gap:20px}
   .clock-main{flex:1 1 auto;min-width:0}
   .an-fig{margin:0;flex:none;align-self:center;width:clamp(156px,21%,224px);text-align:center;background:var(--accent-soft);border:1px solid var(--line);border-radius:22px;padding:10px 10px 8px;box-shadow:var(--shadow)}
-  .an-frame{position:relative;width:100%;aspect-ratio:1/1;border-radius:14px;overflow:hidden;border:3px solid var(--accent);background:#fff;box-shadow:0 6px 18px rgba(60,40,0,.22)}
-  .an-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+  /* Fire HD 10 (Silk) では aspect-ratio が効かず、絶対配置の画像だけだと
+     枠の高さが潰れて「オレンジの線だけ」になる。テストページで見えた
+     方法（画像を通常フローに置き、高さを画像自身から決める）に統一する。 */
+  .an-frame{position:relative;width:100%;border-radius:14px;overflow:hidden;border:3px solid var(--accent);background:#fff;box-shadow:0 6px 18px rgba(60,40,0,.22)}
+  .an-frame img{width:100%;height:auto;display:block;animation:anZoom 16s ease-in-out infinite alternate}
+  /* テストページGで動いて見えた「少しずつズーム」＝ムービー風の動き */
+  @keyframes anZoom{from{transform:scale(1)}to{transform:scale(1.14)}}
   .an-fig figcaption{font-size:14.5px;font-weight:900;color:var(--ink);margin-top:8px;letter-spacing:.06em}
   body.night .an-frame img{filter:brightness(.9)}
   @media (max-width:520px){ .an-fig{width:118px;padding:7px 7px 5px} .clock-card{gap:12px} }
@@ -197,11 +202,14 @@
   .radar-card{grid-column:1 / -1}
   .radar-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 14px}
   .radar-status{font-size:12.5px;color:var(--ink2);font-variant-numeric:tabular-nums;margin:0 0 8px}
+  /* aspect-ratio に頼らず、スナップショット画像（1024×768＝4:3）を
+     通常フローに置いてステージの高さを決める（Fire/Silk 対策）。
+     ライブタイルはその上に絶対配置で重ねる。 */
   .radar-stage{
-    position:relative;width:min(100%,880px);margin:0 auto;aspect-ratio:4/3;
+    position:relative;width:min(100%,880px);margin:0 auto;
     border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#dfe9f2;
   }
-  .radar-snap{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+  .radar-snap{width:100%;height:auto;display:block}
   .radar-live{position:absolute;inset:0;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(3,1fr)}
   .radar-live[hidden]{display:none}
   .rtile{position:relative;overflow:hidden}
@@ -301,7 +309,7 @@
     .radar-legend{display:none}
     footer{margin-top:8px;font-size:11px;line-height:1.5}
   }
-  @media (prefers-reduced-motion: reduce){ *{transition:none !important} }
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important} .an-frame img{animation:none} }
 </style>
 </head>
 <body>
@@ -764,7 +772,8 @@
           if(!shown){
             shown = true;
             radarLive.hidden = false;
-            if(radarSnap) radarSnap.style.display = 'none';
+            // display:none にするとステージの高さが潰れるため、見えなくするだけに留める
+            if(radarSnap) radarSnap.style.visibility = 'hidden';
             if(radarPin) radarPin.hidden = false;
           }
           if(radarStatus) radarStatus.textContent = label;
