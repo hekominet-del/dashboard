@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>ダッシュボード — 高岡</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f2efe9;
+    --bg2:#e9e4d8;
+    --card:#fffdf8;
+    --card2:#f7f3ea;
+    --ink:#1c1e1a;
+    --ink2:#5a5e56;
+    --ink3:#8a8e84;
+    --line:#ddd6c6;
+    --accent:#b45309;
+    --accent-soft:#fef3c7;
+    --rain:#2563eb;
+    --rain-soft:#dbeafe;
+    --sun:#d97706;
+    --good:#15803d;
+    --shadow:0 10px 30px rgba(60,50,20,.08);
+    --radius:20px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0e1210;
+      --bg2:#0e1210;
+      --card:#171c19;
+      --card2:#1d2420;
+      --ink:#f0efe8;
+      --ink2:#b8bcb2;
+      --ink3:#7d8278;
+      --line:#2a322d;
+      --accent:#f0b35e;
+      --accent-soft:#2e2413;
+      --rain:#7db4ff;
+      --rain-soft:#1a2a44;
+      --sun:#f5b04a;
+      --good:#6fce8b;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  body.night{
+    --bg:#060807;
+    --bg2:#060807;
+    --card:#0d100e;
+    --card2:#111512;
+    --ink:#c9cbc2;
+    --ink2:#8b8f85;
+    --ink3:#5f635a;
+    --line:#1e2420;
+    --accent:#c98f3a;
+    --accent-soft:#1e180c;
+    --shadow:none;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Noto Sans JP",system-ui,-apple-system,"Hiragino Sans","Yu Gothic",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit}
+  .wrap{max-width:1280px;margin:0 auto;padding:18px 18px 28px}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .place{display:flex;align-items:center;gap:10px;min-width:0}
+  .place-dot{width:10px;height:10px;border-radius:50%;background:var(--good);flex:none;box-shadow:0 0 0 4px color-mix(in srgb, var(--good) 18%, transparent)}
+  .place h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.02em;white-space:nowrap}
+  .place p{margin:0;font-size:12.5px;color:var(--ink2);white-space:nowrap}
+  .controls{display:flex;flex-wrap:wrap;gap:8px}
+  .btn{
+    appearance:none;border:1px solid var(--line);background:var(--card);color:var(--ink);
+    padding:9px 14px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;
+    display:inline-flex;align-items:center;gap:7px;line-height:1;
+  }
+  .btn:active{transform:scale(.98)}
+  .btn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  .btn svg{width:15px;height:15px;flex:none}
+  .ctl-notice{
+    font-size:13.5px;line-height:1.65;border-radius:12px;padding:12px 14px;margin:-4px 0 14px;
+    background:var(--accent-soft);border:1px solid var(--line);color:var(--ink2);
+  }
+  .ctl-notice b{color:var(--ink)}
+
+  /* ---------- main grid ---------- */
+  .grid{display:grid;grid-template-columns:1.25fr .95fr;gap:14px}
+  @media (max-width:860px){ .grid{grid-template-columns:1fr} }
+
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:22px;
+  }
+  .card-label{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--ink3);text-transform:uppercase;margin:0 0 10px}
+
+  /* clock */
+  .clock-card{display:flex;flex-direction:column;justify-content:center;min-height:300px}
+  .greeting{font-family:"Noto Serif JP",serif;font-size:20px;color:var(--ink2);margin:0 0 2px}
+  .clock{
+    font-variant-numeric:tabular-nums;font-weight:900;line-height:.95;letter-spacing:-.03em;
+    font-size:clamp(76px,13vw,148px);margin:2px 0 6px;display:flex;align-items:baseline;gap:6px;flex-wrap:nowrap;
+  }
+  .clock .sec{font-size:.32em;font-weight:700;color:var(--accent);letter-spacing:0;min-width:1.4em}
+  .date-line{font-size:clamp(18px,2.4vw,24px);font-weight:700;margin:0}
+  .date-line span{color:var(--ink2);font-weight:500;font-size:.78em;margin-left:8px}
+  .clock-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .pill{font-size:12.5px;font-weight:600;background:var(--card2);border:1px solid var(--line);padding:7px 11px;border-radius:999px;color:var(--ink2)}
+  .pill b{color:var(--ink)}
+
+  /* weather now */
+  .now-top{display:flex;gap:18px;align-items:flex-start;justify-content:space-between}
+  .now-temp{font-variant-numeric:tabular-nums;font-size:clamp(64px,9vw,96px);font-weight:900;line-height:1;letter-spacing:-.04em}
+  .now-temp small{font-size:.38em;font-weight:700;vertical-align:top}
+  .now-cond{font-size:19px;font-weight:700;margin-top:6px}
+  .now-sub{font-size:13.5px;color:var(--ink2);line-height:1.6;margin-top:4px}
+  .now-icon{width:84px;height:84px;flex:none}
+  .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+  .detail{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+  .detail dt{font-size:11.5px;color:var(--ink3);font-weight:700;letter-spacing:.06em;margin:0}
+  .detail dd{margin:3px 0 0;font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
+  .detail dd span{font-size:12px;color:var(--ink2);font-weight:500}
+  .sunbar{margin-top:16px}
+  .sunbar-track{height:8px;border-radius:999px;background:var(--line);position:relative;overflow:visible}
+  .sunbar-fill{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:linear-gradient(90deg,#f5b04a,#d97706)}
+  .sunbar-dot{position:absolute;top:50%;width:16px;height:16px;border-radius:50%;background:var(--card);border:3px solid var(--sun);transform:translate(-50%,-50%)}
+  .sunbar-labels{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:start;font-size:11.5px;color:var(--ink2);margin-top:7px;font-variant-numeric:tabular-nums}
+  .sunbar-labels span{white-space:nowrap}
+  .sunbar-labels span:nth-child(2){text-align:center;white-space:normal;line-height:1.4}
+
+  /* forecast */
+  .forecast{grid-column:1 / -1;padding-bottom:16px}
+  .days{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+  @media (max-width:860px){ .days{grid-template-columns:repeat(2,1fr)} .days .day:last-child{grid-column:1 / -1} }
+  @media (max-width:420px){ .days{grid-template-columns:1fr 1fr} }
+  .day{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:14px 12px;text-align:center}
+  .day.today{border-color:var(--accent);background:var(--accent-soft)}
+  .day .dow{font-size:13px;font-weight:700}
+  .day .dow span{display:block;font-size:11px;color:var(--ink3);font-weight:600;margin-top:1px}
+  .day .dic{width:36px;height:36px;margin:8px auto 4px}
+  .day .dcond{font-size:12px;color:var(--ink2);font-weight:600;min-height:2.4em;line-height:1.35}
+  .day .dtemp{font-variant-numeric:tabular-nums;font-weight:900;font-size:19px;margin-top:4px}
+  .day .dtemp span{color:var(--ink3);font-weight:600;font-size:14px}
+  .day .drain{font-size:12px;font-weight:700;color:var(--rain);margin-top:3px;font-variant-numeric:tabular-nums}
+
+  /* news */
+  .news-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;grid-column:1 / -1}
+  @media (max-width:860px){ .news-grid{grid-template-columns:1fr} }
+  .news-list{list-style:none;margin:0;padding:0}
+  .news-list li{border-top:1px solid var(--line);padding:11px 0}
+  .news-list li:first-child{border-top:0;padding-top:2px}
+  .news-list a{text-decoration:none;display:block}
+  .news-list a:hover .news-title{text-decoration:underline;text-underline-offset:3px}
+  .news-time{font-size:11.5px;color:var(--ink3);font-variant-numeric:tabular-nums;font-weight:700;letter-spacing:.03em}
+  .news-title{font-size:15px;font-weight:600;line-height:1.5;margin-top:2px}
+  .news-more{font-size:13px;font-weight:700;color:var(--accent);text-decoration:none;display:inline-block;margin-top:10px}
+
+  /* setup */
+  .setup{grid-column:1 / -1}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  @media (max-width:860px){ .steps{grid-template-columns:1fr} }
+  .step{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .step-num{width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-size:13px;font-weight:900;margin-bottom:10px}
+  .step h3{margin:0 0 6px;font-size:15px}
+  .step p{margin:0;font-size:13.5px;line-height:1.65;color:var(--ink2)}
+  .warn{margin-top:12px;font-size:13px;line-height:1.65;color:var(--ink2);background:var(--accent-soft);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .warn b{color:var(--ink)}
+
+  footer{margin-top:16px;font-size:12px;color:var(--ink3);line-height:1.7;padding:0 4px}
+  footer a{color:var(--ink2)}
+  .dim-overlay{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity .4s;z-index:50}
+  body.night .dim-overlay{opacity:.18}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important} }
+</style>
+</head>
+<body>
+<div class="dim-overlay" aria-hidden="true"></div>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="place">
+      <span class="place-dot" aria-hidden="true"></span>
+      <div>
+        <h1>高岡市 ・ ダッシュボード</h1>
+        <p>富山県高岡市 — 置きっぱなし表示用（試作）</p>
+      </div>
+    </div>
+    <div class="controls" role="group" aria-label="表示コントロール">
+      <button class="btn" id="btnFull" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+        <span id="fullLabel">全画面</span>
+      </button>
+      <button class="btn" id="btnWake" type="button" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.5 4.5l2 2M17.5 17.5l2 2M19.5 4.5l-2 2M6.5 17.5l-2 2"/></svg>
+        <span id="wakeLabel">画面をつけたまま</span>
+      </button>
+      <button class="btn" id="btnNight" type="button" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+        夜間モード
+      </button>
+    </div>
+  </div>
+
+  <div class="ctl-notice" id="ctlNotice" role="status" hidden></div>
+
+  <div class="grid">
+
+    <!-- CLOCK -->
+    <section class="card clock-card" aria-label="時計">
+      <p class="greeting" id="greeting">こんばんは</p>
+      <div class="clock" aria-live="off"><span id="hm">--:--</span><span class="sec" id="sec">--</span></div>
+      <p class="date-line"><span id="dateMain">—</span><span id="dateSub"></span></p>
+      <div class="clock-meta">
+        <span class="pill" id="holidayPill">今日は <b>文化の日</b></span>
+        <span class="pill">日の出 <b>6:17</b> ／ 日の入 <b>16:53</b><span style="font-weight:500">（11/3・高岡）</span></span>
+        <span class="pill" id="dayCount">—</span>
+      </div>
+    </section>
+
+    <!-- WEATHER NOW -->
+    <section class="card" aria-label="高岡市の天気（11月3日20時48分時点）">
+      <p class="card-label">高岡の天気 ・ 11月3日 20:48 時点</p>
+      <div class="now-top">
+        <div>
+          <div class="now-temp">11<small>°C</small></div>
+          <div class="now-cond">晴れ時々くもり</div>
+          <p class="now-sub">11月3日（火）20:48 時点の観測です。<br>その夜は最低 7℃、降水確率 10% でした。</p>
+        </div>
+        <svg class="now-icon" viewBox="0 0 96 96" aria-hidden="true">
+          <circle cx="38" cy="36" r="16" fill="#f5b04a"/>
+          <g stroke="#f5b04a" stroke-width="4" stroke-linecap="round">
+            <path d="M38 10v6M14 36h6M62 36h-4M21 19l4 4M55 19l-4 4"/>
+          </g>
+          <path d="M30 74h44a12 12 0 0 0 2-23.8A20 20 0 0 0 38 58a14 14 0 0 0-8 16z" fill="#cbd5e1"/>
+        </svg>
+      </div>
+      <div class="detail-grid">
+        <dl class="detail" style="margin:0"><dt>湿度</dt><dd>87 <span>%</span></dd></dl>
+        <dl class="detail" style="margin:0"><dt>風</dt><dd>南 5 <span>km/h</span></dd></dl>
+        <dl class="detail" style="margin:0"><dt>気圧</dt><dd>1026 <span>hPa・上昇中</span></dd></dl>
+        <dl class="detail" style="margin:0"><dt>空気</dt><dd>良い <span>AQI 37</span></dd></dl>
+      </div>
+      <div class="sunbar" aria-hidden="true">
+        <div class="sunbar-track"><div class="sunbar-fill" id="sunFill" style="width:100%"></div><div class="sunbar-dot" id="sunDot" style="left:100%"></div></div>
+        <div class="sunbar-labels"><span>日の出 6:17</span><span id="sunMsg">日は沈みました</span><span>日の入 16:53</span></div>
+      </div>
+    </section>
+
+    <!-- FORECAST -->
+    <section class="card forecast" aria-label="週間予報">
+      <p class="card-label">この先の天気 ・ 高岡</p>
+      <div class="days">
+        <div class="day">
+          <div class="dow">明日 11/4<span>水曜</span></div>
+          <svg class="dic" viewBox="0 0 48 48" aria-hidden="true"><path d="M14 36h24a8 8 0 0 0 1-15.8A13 13 0 0 0 15 26a9 9 0 0 0-1 10z" fill="#94a3b8"/><circle cx="18" cy="14" r="7" fill="#f5b04a"/></svg>
+          <div class="dcond">くもり、夜は雨</div>
+          <div class="dtemp">19° <span>/ 12°</span></div>
+          <div class="drain">昼 10% ・ 夜 90%</div>
+        </div>
+        <div class="day">
+          <div class="dow">11/5<span>木曜</span></div>
+          <svg class="dic" viewBox="0 0 48 48" aria-hidden="true"><path d="M12 30h26a9 9 0 0 0 1-17.7A14 14 0 0 0 13 20a10 10 0 0 0-1 10z" fill="#94a3b8"/><g stroke="#2563eb" stroke-width="3" stroke-linecap="round"><path d="M16 38l-2 5M26 38l-2 5M36 38l-2 5"/></g></svg>
+          <div class="dcond">雨</div>
+          <div class="dtemp">19° <span>/ 14°</span></div>
+          <div class="drain">降水 70〜100%</div>
+        </div>
+        <div class="day">
+          <div class="dow">11/6<span>金曜</span></div>
+          <svg class="dic" viewBox="0 0 48 48" aria-hidden="true"><path d="M12 30h26a9 9 0 0 0 1-17.7A14 14 0 0 0 13 20a10 10 0 0 0-1 10z" fill="#94a3b8"/><g stroke="#2563eb" stroke-width="3" stroke-linecap="round"><path d="M18 38l-2 5M30 38l-2 5"/></g></svg>
+          <div class="dcond">にわか雨</div>
+          <div class="dtemp">19° <span>/ 8°</span></div>
+          <div class="drain">降水 60%</div>
+        </div>
+        <div class="day">
+          <div class="dow">11/7<span>土曜</span></div>
+          <svg class="dic" viewBox="0 0 48 48" aria-hidden="true"><path d="M12 30h26a9 9 0 0 0 1-17.7A14 14 0 0 0 13 20a10 10 0 0 0-1 10z" fill="#94a3b8"/><g stroke="#2563eb" stroke-width="3" stroke-linecap="round"><path d="M16 38l-2 5M26 38l-2 5M36 38l-2 5"/></g></svg>
+          <div class="dcond">にわか雨・冷え込む</div>
+          <div class="dtemp">13° <span>/ 7°</span></div>
+          <div class="drain">降水 80%</div>
+        </div>
+        <div class="day">
+          <div class="dow">11/8<span>日曜</span></div>
+          <svg class="dic" viewBox="0 0 48 48" aria-hidden="true"><path d="M14 36h24a8 8 0 0 0 1-15.8A13 13 0 0 0 15 26a9 9 0 0 0-1 10z" fill="#94a3b8"/></svg>
+          <div class="dcond">くもり</div>
+          <div class="dtemp">14° <span>/ 8°</span></div>
+          <div class="drain">降水 10%</div>
+        </div>
+      </div>
+      <p style="margin:12px 2px 0;font-size:13px;color:var(--ink2);line-height:1.6">ひとこと： <b style="color:var(--ink)">明日11/4は日中くもりで19℃まで上がりますが、夜から雨（90%）。</b>明後日以降は雨が続き、週末は最高13〜14℃と冷え込みます。洗濯や外の用事は明日の日中が狙い目です。</p>
+    </section>
+
+    <!-- NEWS -->
+    <div class="news-grid">
+      <section class="card" aria-label="全国ニュース">
+        <p class="card-label">ニュース ・ 全国</p>
+        <ul class="news-list">
+          <li><a href="https://news.web.nhk/newsweb" target="_blank" rel="noopener"><span class="news-time">11/3 18:06 ・ NHK</span><div class="news-title">アメリカ中間選挙 まもなく投票開始 与野党が最後まで支持訴え</div></a></li>
+          <li><a href="https://news.web.nhk/newsweb" target="_blank" rel="noopener"><span class="news-time">11/3 17:32 ・ NHK</span><div class="news-title">野球 日本代表 井口資仁監督が始動 宮崎で強化合宿</div></a></li>
+          <li><a href="https://news.web.nhk/newsweb" target="_blank" rel="noopener"><span class="news-time">11/3 14:40 ・ NHK</span><div class="news-title">皇居で文化勲章の親授式 — 秋の叙勲は計3,861人が受章</div></a></li>
+          <li><a href="https://news.web.nhk/newsweb" target="_blank" rel="noopener"><span class="news-time">11/3 11:53 ・ NHK</span><div class="news-title">カブス 鈴木誠也に“クオリファイング・オファー” 1年36億円</div></a></li>
+          <li><a href="https://news.web.nhk/newsweb" target="_blank" rel="noopener"><span class="news-time">11/3 10:14 ・ NHK</span><div class="news-title">スペイン列車事故 日本人2人の死亡確認 地元当局が身元特定</div></a></li>
+        </ul>
+        <a class="news-more" href="https://news.web.nhk/newsweb" target="_blank" rel="noopener">NHKニュースで続きを読む →</a>
+      </section>
+
+      <section class="card" aria-label="富山・高岡のニュース">
+        <p class="card-label">ニュース ・ 富山 ／ 高岡</p>
+        <ul class="news-list">
+          <li><a href="https://newsdig.tbs.co.jp/articles/-/3056759" target="_blank" rel="noopener"><span class="news-time">11/2 20:04 ・ チューリップテレビ</span><div class="news-title">高岡市役所の庁舎整備、7案を公表 — 全面新築は256億円、耐震補強は36億円</div></a></li>
+          <li><a href="https://www.fnn.jp/category/news-bbt" target="_blank" rel="noopener"><span class="news-time">11/3 ・ 富山テレビ</span><div class="news-title">富山マラソン2026、西川朋秀選手が初優勝 — 約1万5千人が秋の富山を駆ける</div></a></li>
+          <li><a href="https://www.fnn.jp/category/news-bbt" target="_blank" rel="noopener"><span class="news-time">11/3 ・ 富山テレビ</span><div class="news-title">J2 カターレ富山が首位・仙台に1–0で勝利、自動昇格圏内の2位に浮上</div></a></li>
+          <li><a href="https://news.web.nhk/newsweb/area/160" target="_blank" rel="noopener"><span class="news-time">11/2 17:59 ・ NHK富山</span><div class="news-title">国宝の瑞龍寺で秀吉の書状などを一般公開（高岡）</div></a></li>
+          <li><a href="https://www.fnn.jp/category/news-bbt" target="_blank" rel="noopener"><span class="news-time">11/3 ・ 富山テレビ</span><div class="news-title">北陸電力「ほくリンク」会員のメールアドレス約55万件が流出 — 委託先への不正アクセスで</div></a></li>
+        </ul>
+        <a class="news-more" href="https://news.web.nhk/newsweb/area/160" target="_blank" rel="noopener">NHK富山の地域ニュース →</a>
+      </section>
+    </div>
+
+    <!-- SETUP -->
+    <section class="card setup" id="setupCard" aria-label="タブレットでの使い方">
+      <p class="card-label">Androidタブレットで表示しっぱなしにする手順</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <h3>このページを開く</h3>
+          <p>タブレットの Chrome でこのページを開き、横向きに置きます。時計はタブレットの時刻で自動更新されます（1秒ごと）。</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <h3>全画面 ＋ つけたまま</h3>
+          <p>上のボタンを押します。ただし Muse の画面の中に表示されている状態では、ブラウザの制限でボタンが効きません（その場合ボタンは「全画面の方法」に変わり、押すと対処法を表示します）。全画面まで確実にしたい場合は、無料アプリ「Fully Kiosk Browser」でこのページを開く方法があります（アプリ側の設定で全画面表示と消灯防止ができます）。消灯防止だけなら手順3の本体設定が確実です。</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <h3>本体設定で確実に消さない</h3>
+          <p>設定 → ディスプレイ → 画面タイムアウトを最長に。さらに「設定 → システム → 開発者向けオプション → 充電中はスリープしない」をONにすると、充電中は画面が消えません（開発者向けオプションが見当たらない場合は「タブレット情報」のビルド番号を7回タップすると出てきます）。夜は上の「夜間モード」で焼き付きと眩しさを抑えられます。</p>
+        </div>
+      </div>
+      <p class="warn"><b>充電の注意：</b> つなぎっぱなしはバッテリーが膨らむ原因になります。週に一度は膨らみがないか裏面を確認し、タイマー付きプラグで充電を間欠にするのが安全です。熱くなる置き場所（直射日光・コンロ近く）は避けてください。</p>
+    </section>
+
+  </div>
+
+  <footer>
+    時計・日付はこの端末の時刻でライブ表示しています。天気とニュースは <b>2026年11月3日（火）20:48 時点</b>に取得した内容です（出典：天気 weather.com、ニュース NHK／チューリップテレビ／富山テレビ）。新しい内容に差し替えるには、このページの更新が必要です — 「天気を新しくして」と声をかけてください。<br>
+    日の出・日の入： 11月3日 高岡（日の出 6:17 ／ 日の入 16:53）。
+  </footer>
+</div>
+
+<script>
+(function(){
+  var hm = document.getElementById('hm');
+  var sec = document.getElementById('sec');
+  var dateMain = document.getElementById('dateMain');
+  var dateSub = document.getElementById('dateSub');
+  var greeting = document.getElementById('greeting');
+  var dayCount = document.getElementById('dayCount');
+  var sunFill = document.getElementById('sunFill');
+  var sunDot = document.getElementById('sunDot');
+  var sunMsg = document.getElementById('sunMsg');
+  function pad(n){ return (n<10?'0':'')+n; }
+  var fmt = null;
+  try{ fmt = new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo',year:'numeric',month:'numeric',day:'numeric',weekday:'short',hour:'numeric',minute:'numeric',second:'numeric',hourCycle:'h23'}); }catch(e){ fmt = null; }
+  var holidayPill = document.getElementById('holidayPill');
+
+  function tokyoParts(){
+    var now = new Date();
+    if(!fmt){ return {h:now.getHours(),m:now.getMinutes(),s:now.getSeconds(),y:now.getFullYear(),mo:now.getMonth()+1,d:now.getDate(),dow:['日','月','火','水','木','金','土'][now.getDay()]}; }
+    var parts = fmt.formatToParts(now), o = {};
+    for(var i=0;i<parts.length;i++){ o[parts[i].type]=parts[i].value; }
+    return {h:parseInt(o.hour,10)%24, m:parseInt(o.minute,10), s:parseInt(o.second,10), y:parseInt(o.year,10), mo:parseInt(o.month,10), d:parseInt(o.day,10), dow:(o.weekday||'').replace('曜日','')};
+  }
+
+  function tick(){
+    var t = tokyoParts();
+    var h = t.h, m = t.m, s = t.s;
+    hm.textContent = pad(h)+':'+pad(m);
+    sec.textContent = pad(s);
+    var y = t.y, mo = t.mo, d = t.d, dow = t.dow;
+    dateMain.textContent = mo+'月'+d+'日（'+dow+'）';
+    dateSub.textContent = y+'年 ・ 日本時間';
+    var g = 'こんばんは';
+    if(h>=5 && h<11) g='おはようございます';
+    else if(h>=11 && h<17) g='こんにちは';
+    else if(h>=17 && h<23) g='こんばんは';
+    else g='おつかれさまです';
+    greeting.textContent = g;
+    if(holidayPill){ holidayPill.style.display = (mo===11 && d===3) ? '' : 'none'; }
+
+    // day of year (Tokyo date)
+    var start = Date.UTC(y,0,1);
+    var curUtc = Date.UTC(y,mo-1,d);
+    var doy = Math.floor((curUtc - start)/86400000)+1;
+    var leap = (y%4===0 && (y%100!==0||y%400===0)) ? 366 : 365;
+    dayCount.innerHTML = '今年 <b>'+doy+'日目</b> ／ 残り <b>'+(leap-doy)+'日</b>';
+
+    // sun progress for Takaoka snapshot times (6:17 - 16:53) — only meaningful same-day, still shows position by clock
+    var sunrise = 6*60+17, sunset = 16*60+53, cur = h*60+m + s/60;
+    var p = (cur - sunrise)/(sunset - sunrise);
+    if(p<0) p=0; if(p>1) p=1;
+    var pct = Math.round(p*100);
+    if(sunFill) sunFill.style.width = pct+'%';
+    if(sunDot) sunDot.style.left = pct+'%';
+    if(sunMsg){
+      if(cur < sunrise) sunMsg.textContent = '日の出まで あと '+Math.floor((sunrise-cur)/60)+'時間'+Math.round((sunrise-cur)%60)+'分';
+      else if(cur <= sunset){ var left = sunset-cur; sunMsg.textContent = '日の入まで あと '+Math.floor(left/60)+'時間'+Math.round(left%60)+'分'; }
+      else sunMsg.textContent = '日は沈みました';
+    }
+  }
+  tick();
+  setInterval(tick, 500);
+
+  // Control feedback notice (shown in-page under the controls)
+  var ctlNotice = document.getElementById('ctlNotice');
+  var noticeTimer = null;
+  function showNotice(html, sticky){
+    if(!ctlNotice) return;
+    ctlNotice.innerHTML = html;
+    ctlNotice.hidden = false;
+    if(noticeTimer){ clearTimeout(noticeTimer); noticeTimer = null; }
+    if(!sticky){ noticeTimer = setTimeout(function(){ ctlNotice.hidden = true; }, 12000); }
+  }
+
+  // Fullscreen — inside the Muse app view the browser blocks the
+  // Fullscreen API (the page sits in an embedded frame without the
+  // permission). document.fullscreenEnabled === false detects that
+  // environment up front: the button then becomes a guide button that
+  // shows the method that actually works, instead of a dead control.
+  var btnFull = document.getElementById('btnFull');
+  var fullLabel = document.getElementById('fullLabel');
+  var fsBlocked = (document.fullscreenEnabled === false);
+  function fsActive(){ return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+  function syncFullLabel(){
+    if(!fullLabel) return;
+    fullLabel.textContent = fsActive() ? '全画面を終了' : (fsBlocked ? '全画面の方法' : '全画面');
+  }
+  document.addEventListener('fullscreenchange', syncFullLabel);
+  document.addEventListener('webkitfullscreenchange', syncFullLabel);
+  syncFullLabel();
+  function showFullscreenGuide(){
+    showNotice('<b>この表示では全画面ボタンは使えません。</b> ページが Muse の画面の中に埋め込まれているため、ブラウザが全画面を禁止しています。全画面で置きっぱなしにしたい場合は、無料アプリ <b>Fully Kiosk Browser</b>（Playストア）でこのページを開くのが確実です。アプリ側の設定で「全画面表示」と「画面を消灯しない」を有効にでき、このページのボタンに頼らず使えます。下の手順カードにもまとめました。', true);
+    var card = document.getElementById('setupCard');
+    if(card && card.scrollIntoView){ try{ card.scrollIntoView({behavior:'smooth', block:'start'}); }catch(e){ card.scrollIntoView(); } }
+  }
+  btnFull.addEventListener('click', function(){
+    if(fsActive()){
+      var ex = document.exitFullscreen || document.webkitExitFullscreen;
+      if(ex) ex.call(document);
+      return;
+    }
+    if(fsBlocked){ showFullscreenGuide(); return; }
+    var el = document.documentElement;
+    var req = el.requestFullscreen || el.webkitRequestFullscreen;
+    if(!req){ showFullscreenGuide(); return; }
+    try{
+      var r = req.call(el);
+      if(r && r.catch){ r.catch(showFullscreenGuide); }
+      else { setTimeout(function(){ if(!fsActive()) showFullscreenGuide(); }, 400); }
+    }catch(e){ showFullscreenGuide(); }
+  });
+
+  // Night mode
+  var btnNight = document.getElementById('btnNight');
+  btnNight.addEventListener('click', function(){
+    var on = document.body.classList.toggle('night');
+    btnNight.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+
+  // Keep-awake: first try the Wake Lock API. Inside the Muse app view the
+  // browser usually blocks it, so fall back to playing a tiny silent canvas
+  // video (a playing video keeps the screen on in Chrome on Android).
+  // If both fail, the notice points to the tablet setting that always works.
+  var btnWake = document.getElementById('btnWake');
+  var wakeLabel = document.getElementById('wakeLabel');
+  var wakeLock = null;      // WakeLockSentinel while API mode is active
+  var wakeVideo = null;     // fallback <video> element
+  var wakeDrawTimer = null; // redraw timer feeding the fallback video
+  var wakeWanted = false;   // user turned keep-awake on
+
+  function setWakeUI(on, mode){
+    btnWake.setAttribute('aria-pressed', on ? 'true' : 'false');
+    wakeLabel.textContent = !on ? '画面をつけたまま' : (mode === 'video' ? 'つけたまま ON（代替方式）' : 'つけたまま ON');
+  }
+  function stopVideoFallback(){
+    if(wakeDrawTimer){ clearInterval(wakeDrawTimer); wakeDrawTimer = null; }
+    if(wakeVideo){
+      try{ wakeVideo.pause(); }catch(e){}
+      try{ wakeVideo.srcObject = null; }catch(e){}
+      if(wakeVideo.parentNode) wakeVideo.parentNode.removeChild(wakeVideo);
+      wakeVideo = null;
+    }
+  }
+  function wakeOff(silent){
+    wakeWanted = false;
+    if(wakeLock){ try{ wakeLock.release(); }catch(e){} wakeLock = null; }
+    stopVideoFallback();
+    setWakeUI(false);
+    if(!silent && ctlNotice) ctlNotice.hidden = true;
+  }
+  function startVideoFallback(){
+    if(!document.createElement('canvas').captureStream) return false;
+    var canvas = document.createElement('canvas');
+    canvas.width = 32; canvas.height = 32;
+    var ctx = canvas.getContext('2d');
+    var hue = 0;
+    function draw(){ hue = (hue + 40) % 360; ctx.fillStyle = 'hsl(' + hue + ',40%,40%)'; ctx.fillRect(0, 0, 32, 32); }
+    draw();
+    var stream;
+    try{ stream = canvas.captureStream(2); }catch(e){ return false; }
+    var v = document.createElement('video');
+    v.muted = true; v.loop = true; v.autoplay = true;
+    v.setAttribute('playsinline', '');
+    v.setAttribute('aria-hidden', 'true');
+    v.style.cssText = 'position:fixed;right:4px;bottom:4px;width:6px;height:6px;opacity:.05;pointer-events:none;z-index:1';
+    v.srcObject = stream;
+    document.body.appendChild(v);
+    wakeVideo = v;
+    wakeDrawTimer = setInterval(draw, 1000);
+    var played = false;
+    try{
+      var p = v.play();
+      if(p && p.then){ p.then(function(){ played = true; }, function(){ stopVideoFallback(); wakeFailed(); }); }
+      else played = true;
+    }catch(e){ stopVideoFallback(); return false; }
+    setWakeUI(true, 'video');
+    showNotice('<b>画面をつけたまま（代替方式）でONにしました。</b> 通常の方式がこの表示では使えなかったため、小さな映像を再生し続けて消灯を防いでいます。確実に消したくない場合は、下の手順3の<b>「充電中はスリープしない」</b>設定も合わせてどうぞ。');
+    return true;
+  }
+  function wakeFailed(){
+    if(!wakeWanted) return;
+    wakeOff(true);
+    showNotice('<b>画面をつけたままにできませんでした。</b> Muse の画面の中に表示されている状態では、ブラウザの制限で消灯防止が禁止されています。確実な方法はタブレット本体の設定です： <b>設定 → システム → 開発者向けオプション →「充電中はスリープしない」をON</b>（詳しくは下の手順3）。', true);
+  }
+  function requestWakeLock(){
+    navigator.wakeLock.request('screen').then(function(lock){
+      wakeLock = lock;
+      lock.addEventListener('release', function(){
+        wakeLock = null;
+        if(wakeWanted && !document.hidden){
+          // Released while still wanted: fall back to the video method.
+          if(!wakeVideo && !startVideoFallback()) wakeFailed();
+        } else if(!wakeWanted){ setWakeUI(false); }
+      });
+      setWakeUI(true, 'api');
+      showNotice('<b>画面をつけたままにしました。</b> このボタンをもう一度押すと解除されます。');
+    }).catch(function(){
+      if(!startVideoFallback()) wakeFailed();
+    });
+  }
+  btnWake.addEventListener('click', function(){
+    if(wakeWanted){ wakeOff(); return; }
+    wakeWanted = true;
+    if('wakeLock' in navigator){ requestWakeLock(); }
+    else if(!startVideoFallback()){ wakeFailed(); }
+  });
+  document.addEventListener('visibilitychange', function(){
+    // Wake locks are auto-released when the page is hidden; re-acquire on return.
+    if(!document.hidden && wakeWanted && !wakeLock && !wakeVideo && 'wakeLock' in navigator){ requestWakeLock(); }
+    if(!document.hidden && wakeWanted && wakeVideo){ try{ wakeVideo.play(); }catch(e){} }
+  });
+})();
+</script>
+</body>
+</html>
