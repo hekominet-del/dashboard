@@ -186,12 +186,12 @@
   /* ---------- An (dog) in clock card ---------- */
   .clock-card{flex-direction:row;align-items:center;gap:20px}
   .clock-main{flex:1 1 auto;min-width:0}
-  .an-fig{margin:0;flex:none;align-self:center;width:clamp(118px,17%,188px);text-align:center}
-  .an-frame{position:relative;width:100%;aspect-ratio:1/1;border-radius:18px;overflow:hidden;border:1px solid var(--line);background:#fff}
+  .an-fig{margin:0;flex:none;align-self:center;width:clamp(156px,21%,224px);text-align:center;background:var(--accent-soft);border:1px solid var(--line);border-radius:22px;padding:10px 10px 8px;box-shadow:var(--shadow)}
+  .an-frame{position:relative;width:100%;aspect-ratio:1/1;border-radius:14px;overflow:hidden;border:3px solid var(--accent);background:#fff;box-shadow:0 6px 18px rgba(60,40,0,.22)}
   .an-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-  .an-fig figcaption{font-size:12.5px;font-weight:700;color:var(--ink2);margin-top:6px}
-  body.night .an-frame img{filter:brightness(.82)}
-  @media (max-width:520px){ .an-fig{width:96px} .clock-card{gap:12px} }
+  .an-fig figcaption{font-size:14.5px;font-weight:900;color:var(--ink);margin-top:8px;letter-spacing:.06em}
+  body.night .an-frame img{filter:brightness(.9)}
+  @media (max-width:520px){ .an-fig{width:118px;padding:7px 7px 5px} .clock-card{gap:12px} }
 
   /* ---------- rain radar ---------- */
   .radar-card{grid-column:1 / -1}
@@ -265,9 +265,10 @@
     .radar-card{grid-column:3;grid-row:1}
     .forecast{grid-column:1 / -1}
     .clock-card{gap:12px}
-    .an-fig{width:104px}
-    .an-frame{border-radius:12px}
-    .an-fig figcaption{font-size:11px;margin-top:4px}
+    .clock{font-size:clamp(50px,min(5.8vw,12.5vh),80px)}
+    .an-fig{width:144px;padding:8px 8px 6px;border-radius:16px}
+    .an-frame{border-radius:10px}
+    .an-fig figcaption{font-size:12.5px;margin-top:5px}
     .radar-stage{width:100%;border-radius:12px}
     .radar-legend{width:100%;margin-top:7px;font-size:10.5px;gap:7px}
     .radar-foot{width:100%;margin-top:5px;font-size:11px}
@@ -295,7 +296,8 @@
     .forecast-note{display:none}
     .setup{display:none}
     .news-list li:nth-child(n+4){display:none}
-    .an-fig{width:82px}
+    .an-fig{width:120px;padding:6px 6px 4px}
+    .an-fig figcaption{font-size:11.5px;margin-top:3px}
     .radar-legend{display:none}
     footer{margin-top:8px;font-size:11px;line-height:1.5}
   }
